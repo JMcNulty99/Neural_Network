@@ -42,11 +42,11 @@ class Neural_Network(object):
 				self.weights += [[     [random.uniform(-1,1) for x in range(num_neurons_per_layer_[i+1])]     for j in range(0,num_neurons_per_layer_[i])]]
 
 
-	# sigmasoid function, used as the activation function of the network
-	# can also compute the dirivative of the sigmasoid function as requested
+	# sigmoid function, used as the activation function of the network
+	# can also compute the dirivative of the sigmoid function as requested
 	# default is to compute the value and not the dertivative
 	# PRIVATE dont mess with this, you should never need to call it
-	def sigmasoid(self, x, deriv=False):
+	def sigmoid(self, x, deriv=False):
 		if(deriv):
 			return x*(1-x)
 		return 1/(1+ (math.e ** (-1*x)))
@@ -70,11 +70,11 @@ class Neural_Network(object):
 		self.layers[0] = data
 		for i in range(1, self.layer_count-1):
 			# calculate the next line of output
-			self.layers[i] = self.dot_with_func(self.layers[i-1], self.weights[i-1], lambda x: self.sigmasoid(x,False))
+			self.layers[i] = self.dot_with_func(self.layers[i-1], self.weights[i-1], lambda x: self.sigmoid(x,False))
 
 			# set bias values
 			self.layers[i][0] = 1
-		self.layers[-1] = self.dot_with_func(self.layers[-2], self.weights[-1], lambda x: self.sigmasoid(x,False))
+		self.layers[-1] = self.dot_with_func(self.layers[-2], self.weights[-1], lambda x: self.sigmoid(x,False))
 		return self.layers[-1]
 
 	# trains the network with the given input and output data
@@ -100,7 +100,7 @@ class Neural_Network(object):
 
 		# calculate the final error and final change
 		error[-1] = final_error
-		change[-1] = [error[-1][i]*self.sigmasoid(self.layers[-1][i],True) for i in range(len(error[-1]))]
+		change[-1] = [error[-1][i]*self.sigmoid(self.layers[-1][i],True) for i in range(len(error[-1]))]
 
 		# #print the error
 		# #print "error is: " "{0:.5f}".format(abs(sum(error[-1])))
@@ -114,7 +114,7 @@ class Neural_Network(object):
 					new[c][r] = self.weights[n][r][c]
 			# calculate the error and change
 			error[n] = self.dot_with_func(change[n+1], (new), lambda x: x)
-			change[n] = [error[n][i] * self.sigmasoid(self.layers[n][i], True) for i in range(len(error[n]))]
+			change[n] = [error[n][i] * self.sigmoid(self.layers[n][i], True) for i in range(len(error[n]))]
 
 		# add the change to the weights
 		for i in range(0, len(self.weights)):
